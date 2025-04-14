@@ -1,0 +1,88 @@
+[en]
+MESSAGE_GAME_START = Game commencing!
+MESSAGE_GAME_COUNTING = Remaining time for zombie selection: %i second(s)
+MESSAGE_ALIVETIME = It's Survival Time!
+MESSAGE_NOTENOUGHPOWER = Not enough Adrenaline Power...
+MESSAGE_REVIVING = You will be revived after: %i second(s)
+MESSAGE_CANT_REVIVE = You have been killed permanently due to [Concentrated Fire]!
+MESSAGE_NIGHTSTALKER_CHOSEN1 = You've been chosen as [Night Stalker]!
+MESSAGE_NIGHTSTALKER_CHOSEN2A = [%s] has been chosen as [Night Stalker]!
+MESSAGE_NIGHTSTALKER_CHOSEN2B = [%s] have been chosen as [Night Stalker]!
+
+NOTICE_ROUNDSTART1 = Someone will get infected... Don't trust anyone!
+NOTICE_ROUNDSTART2 = Be careful, someone will just get infected!
+NOTICE_ROUNDSTART3 = Get ready for the battle, someone will be infected!
+NOTICE_GAMESTART1 = Use Concentrated Fire to kill zombies permanently! (Button [T])
+NOTICE_GAMESTART2 = Zombies are here, we're under attack!
+NOTICE_GAMESTART3 = Kick zombies away! (Button [E])
+NOTICE_ZM_FIRSTZOMBIE1 = I...am...a ZOMBIE!!! ... Attack... Kill Humans.... Kill! Kill!
+NOTICE_ZM_FIRSTZOMBIE2 = Zombies... i have special skills ... (Button: [W] + [W])
+NOTICE_ZM_FIRSTZOMBIE3 = Humans are our... slaves, we'll get... eternal life!
+NOTICE_HM_NIGHTSTART1 = It's getting dark... Stick together everyone!
+NOTICE_HM_NIGHTSTART2 = Dark! Everyone! Run! Run! Run!
+NOTICE_HM_NIGHTSTART3 = At night, Zombies seems to be powerful, and won't die!
+NOTICE_HM_NIGHTEND1 = Ammunition and Supplies have arrived! Eliminate zombies quickly!
+NOTICE_HM_NIGHTEND2 = Zombies now are weak, It's a great opportunity to fight back against zombies!
+NOTICE_HM_NIGHTEND3 = Sky is bright! Ammunition Supplies has been dropped!
+NOTICE_ZM_NIGHTSTART1 = Night's coming!... We'll be even more powerful!
+NOTICE_ZM_NIGHTSTART2 = Uh!... The night... the dark power... we are unstoppable!
+NOTICE_ZM_NIGHTSTART3 = At night, Zombie's Adrenaline recovers very fast!
+NOTICE_ZM_NIGHTEND1 = Aah... Sun is rising... i'm losing...my strength gradually...
+NOTICE_ZM_NIGHTEND2 = Dawn!... Day light!... Can't die... CAN'T DIE!!!!
+NOTICE_ZM_NIGHTEND3 = Sky is bright!... Do not give up... need human's blood...
+
+HUD_DAY = [DAY]^n%i
+HUD_SCOREDAMAGE = [SCORE] %i^n[DAMAGE] %i
+HUD_ATKINCREASE = ATK +%i
+HUD_CF = +Concentrated Fire
+HUD_NIGHT = Empowered Night
+HUD_HEALTH_HEALING = Health: Healing
+HUD_HEALTH_DRAINING = Health: Draining
+HUD_SPEED_INC = Speed: Increasing
+HUD_SPEED_DEC = Speed: Deceasing
+HUD_STRENGTH_HARD = Strength: Hardening
+HUD_STRENGTH_WEAK = Strength: Weakening
+HUD_CFAVAILABLE = [T] - Concentrated Fire
+HUD_ZOMBIESKILL = [Right Mouse] - %s (%i time(s))
+HUD_ZOMBIESKILL_INV = Invisible Percent: %i
+
+ZOMBIE_CLASS_REGULAR_NAME = Regular
+ZOMBIE_CLASS_REGULAR_DESC = Climb & Berserk
+ZOMBIE_CLASS_REGULAR_SKILL = Climb
+ZOMBIE_CLASS_LIGHT_NAME = Light
+ZOMBIE_CLASS_LIGHT_DESC = Pounce & Invisible
+ZOMBIE_CLASS_LIGHT_SKILL = Pounce
+ZOMBIE_CLASS_HEAVY_NAME = Heavy 
+ZOMBIE_CLASS_HEAVY_DESC = Quake & Hardening
+ZOMBIE_CLASS_HEAVY_SKILL = Quake
+ZOMBIE_CLASS_NIGHTSTALKER_NAME = Night Stalker
+ZOMBIE_CLASS_NIGHTSTALKER_DESC = Berserk/Inv/Def/Dash
+ZOMBIE_CLASS_NIGHTSTALKER_SKILL = Air-Dashing
+ZOMBIE_CLASS_SPINDIVER_NAME = Spin Diver
+ZOMBIE_CLASS_SPINDIVER_DESC = Rolling & Pounce
+ZOMBIE_CLASS_SPINDIVER_SKILL = Pounce
+
+WIN_HUMAN = Humans Win!
+WIN_ZOMBIE = Zombies Win!
+
+MENU_ZOMBIE_SELECTION = Zombie Class Selection
+MENU_ZOMBIE_UNLOCKED = You've unlocked !t%s!n with !t$%i!n!
+MENU_ZOMBIE_UNLOCK_MONEY = You need !t$%i!n to unlock !t%s!n...
+NOTICE_SELECTTIME = You have !t%i!n second(s) to select zombie class...
+ERROR_NOCLASS = No Zombie Class Loaded!
+
+STAT_REACH_TOP1 = You have reached the !tTop 1st!n!
+STAT_REACH_TOP1ALL = Player !g%s!n is leading as !tTop 1st!n with !t%i!n total damage!
+STAT_REACH_TOP2 = You have reached the !tTop 2nd!n!
+STAT_REACH_TOP3 = You have reached the !tTop 3rd!n!
+STAT_ROUNDEND = [TOP DAMAGE]^n^n1st. %s^n2nd. %s^n3rd. %s
+
+WEAPON_TYPE_PRI = Primary
+WEAPON_TYPE_SEC = Secondary
+WEAPON_TYPE_MELEE = Melee
+WEAPON_MENU_NAMEF = Weapon Selection
+WEAPON_MENU_NAME = \ySelect %s Weapon
+WEAPON_MENU_NEW = New Weapons
+WEAPON_MENU_PREVIOUS = Previous Weapons
+WEAPON_UNLOCKED = You've unlocked !t%s!n with !t$%i!n!
+WEAPON_UNLOCK_MONEY = You need !t$%i!n to unlock !t%s!n...
