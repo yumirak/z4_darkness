@@ -134,6 +134,7 @@ new g_BlockedObj[15][32] =
 
 new const CS_TEAM_NAMES[][] = { "UNASSIGNED", "TERRORIST", "CT", "SPECTATOR" }
 
+#if defined FIXED_WEAPON_KNOCKBACK
 // Knockback
 new Float:kb_weapon_power[] = 
 {
@@ -169,6 +170,7 @@ new Float:kb_weapon_power[] =
 	-1.0,	// ---
 	2.0		// P90
 }
+#endif
 
 // MACROS
 #define Get_BitVar(%1,%2) (%1 & (1 << (%2 & 31)))
@@ -213,6 +215,7 @@ public plugin_init()
 	RegisterHam(Ham_Spawn, "player", "fw_PlayerSpawn_Post", 1)
 	RegisterHam(Ham_Killed, "player", "fw_PlayerKilled_Post", 1)
 	RegisterHam(Ham_TakeDamage, "player", "fw_PlayerTakeDamage")
+	RegisterHam(Ham_TakeDamage, "player", "fw_PlayerTakeDamage_Post",1)
 	RegisterHam(Ham_TraceAttack, "player", "fw_PlayerTraceAttack")
 	RegisterHam(Ham_TraceAttack, "player", "fw_PlayerTraceAttack_Post", 1)
 	RegisterHam(Ham_Use, "func_tank", "fw_UseStationary")
@@ -2632,7 +2635,8 @@ public fw_PlayerSpawn_Post(id)
 
 	static PlayerModel[32]
 	ArrayGetString(HumanModel, g_HumanModel[id], PlayerModel, sizeof(PlayerModel))
-	set_playermodel(id, PlayerModel, false)
+	rg_reset_user_model(id, true)
+	set_playermodel(id, PlayerModel, true)
 	
 	// Fade Out
 	message_begin(MSG_ONE_UNRELIABLE, g_MsgScreenFade, {0,0,0}, id)
@@ -2692,7 +2696,17 @@ public fw_PlayerKilled_Post(Victim, Attacker)
 }
 
 public Set_LightStart(id) SetPlayerLight(id, GameLight[g_CurrentGameLight])
+
 public fw_PlayerTakeDamage(Victim, Inflictor, Attacker, Float:Damage, DamageBits)
+{
+	// Cancel damage when game not yet started
+	if(!g_GameStarted || g_GameEnded || !g_InfectionStart)
+		return HAM_SUPERCEDE
+
+	return HAM_IGNORED
+}
+
+public fw_PlayerTakeDamage_Post(Victim, Inflictor, Attacker, Float:Damage, DamageBits)
 {
 	if(!g_GameStarted || g_GameEnded || !g_InfectionStart)
 		return HAM_SUPERCEDE
@@ -2746,7 +2760,9 @@ public fw_PlayerTakeDamage(Victim, Inflictor, Attacker, Float:Damage, DamageBits
 				}
 			}
 		}
-		
+
+		if(pev_valid(Victim) == 2) set_member(Victim, m_flVelocityModifier, 0.25) // TODO: zclass_painshock
+
 		SetHamParamFloat(4, CurrentDamage)
 	} else if((!Get_BitVar(g_IsZombie, Victim)/* && !Get_BitVar(g_IsNightStalker, Victim)*/) && (Get_BitVar(g_IsZombie, Attacker)/* || Get_BitVar(g_IsNightStalker, Attacker)*/)) { // Zombie -> Human
 		if(DamageBits & (1<<24)) return HAM_SUPERCEDE
@@ -2785,11 +2801,12 @@ public fw_PlayerTraceAttack_Post(victim, attacker, Float:damage, Float:direction
 	
 	if(Get_BitVar(g_IsZombie, victim) /*|| Get_BitVar(g_IsNightStalker, victim)*/)
 	{
-		new ducking = pev(victim, pev_flags) & (FL_DUCKING | FL_ONGROUND) == (FL_DUCKING | FL_ONGROUND)
+		static flying; flying = !(pev(victim, pev_flags) & FL_ONGROUND)
+		static ducking; ducking = pev(victim, pev_flags) & (FL_DUCKING | FL_ONGROUND) == (FL_DUCKING | FL_ONGROUND)
 		if (ducking && g_KB_Ducking == 0.0)
 			return;
 	
-		static origin1[3], origin2[3]
+		static origin1[3], origin2[3], Float:flDamageKnockback
 		get_user_origin(victim, origin1)
 		get_user_origin(attacker, origin2)
 	
@@ -2799,14 +2816,16 @@ public fw_PlayerTraceAttack_Post(victim, attacker, Float:damage, Float:direction
 		static Float:velocity[3]
 		pev(victim, pev_velocity, velocity)
 		
-		if(g_KB_Damage) xs_vec_mul_scalar(direction, damage, direction)
-		
+		flDamageKnockback = floatclamp(damage * 0.5, 0.0, 100.0)
+		if(g_KB_Damage) xs_vec_mul_scalar(direction, flDamageKnockback, direction)
+#if defined FIXED_WEAPON_KNOCKBACK
 		new attacker_weapon = get_user_weapon(attacker)
-		
 		if(g_KB_WeaponPower && kb_weapon_power[attacker_weapon] > 0.0)
 			xs_vec_mul_scalar(direction, kb_weapon_power[attacker_weapon], direction)
+#endif
+		if(flying) xs_vec_mul_scalar(direction, 2.0, direction)
+		else if(ducking) xs_vec_mul_scalar(direction, g_KB_Ducking, direction)
 		
-		if(ducking) xs_vec_mul_scalar(direction, g_KB_Ducking, direction)
 		if(g_KB_ZombieClass) 
 		{
 			if(Get_BitVar(g_IsZombie, victim)) xs_vec_mul_scalar(direction, ArrayGetCell(ZombieKnockback, g_ZombieClass[victim]), direction)
