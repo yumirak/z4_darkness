@@ -91,7 +91,7 @@ public Load_ClassConfig()
 	
 	/// Skill
 	g_RollingSpeed = Setting_Load_Int(SETTING_FILE, "Spin Diver", "ROLLING_SPEED")
-	Setting_Load_String(SETTING_FILE, "Spin DIver", "ROLLING_DEFENSE", Buffer, sizeof(Buffer));  g_RollingDefense = str_to_float(Buffer)
+	Setting_Load_String(SETTING_FILE, "Spin Diver", "ROLLING_DEFENSE", Buffer, sizeof(Buffer));  g_RollingDefense = str_to_float(Buffer)
 	g_RollingDecPer01Sec = Setting_Load_Int(SETTING_FILE, "Spin Diver", "ROLLING_DECREASE_PER015SEC")
 	Setting_Load_String(SETTING_FILE, "Spin Diver", "ROLLING_SOUND", g_RollingSound, sizeof(g_RollingSound))
 	
@@ -196,21 +196,19 @@ public client_PreThink(id)
 {
 	if(!Get_BitVar(g_IsUserAlive, id))
 		return
-		
+	if(!g_GameStart)
+		return
+	if(!zd_get_user_zombie(id))
+		return
+	if(zd_get_user_zombieclass(id) != g_zombieclass)
+		return
+	if(zd_get_zombie_stun(id) || zd_get_zombie_slowdown(id))
+		return
 	static CurButton; CurButton = pev(id, pev_button)
 	static OldButton; OldButton = pev(id, pev_oldbuttons)
 	
 	if((CurButton & IN_FORWARD)) 
 	{
-		if(!g_GameStart)
-			return 
-		if(!zd_get_user_zombie(id))
-			return
-		if(zd_get_user_zombieclass(id) != g_zombieclass)
-			return
-		if(zd_get_zombie_stun(id) || zd_get_zombie_slowdown(id))
-			return
-		
 		if(Get_BitVar(g_Rolling, id))
 		{
 			// Make the player crouch
@@ -268,7 +266,7 @@ public client_PreThink(id)
 			g_PlayerKey[id][1] = 'w'
 		}
 	} else {
-		if(OldButton & IN_FORWARD)
+		if(OldButton & IN_FORWARD && Get_BitVar(g_Rolling, id) )
 		{
 			Deactive_RollingSkill(id)
 		}
