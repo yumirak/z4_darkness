@@ -519,14 +519,14 @@ public Bot_RegisterHam(id)
 
 public GM_Time()
 {
-	if(g_GameStarted && (Get_TotalInPlayer(2) < g_MinPlayer))
+	if(g_GameStarted && (Get_TotalInPlayer(GetPlayersFlags:GetPlayers_None) < g_MinPlayer))
 	{
 		g_GameStarted = 0
 		g_GameEnded = 0
 		g_InfectionStart = 0
 	}
 	
-	if(!g_GameStarted && (Get_TotalInPlayer(2) >= g_MinPlayer)) // START GAME NOW :D
+	if(!g_GameStarted && (Get_TotalInPlayer(GetPlayersFlags:GetPlayers_None) >= g_MinPlayer)) // START GAME NOW :D
 	{
 		g_GameStarted = 1
 		g_InfectionStart = 0
@@ -588,7 +588,7 @@ public Check_Gameplay()
 	if(!g_GameStarted || g_GameEnded || !g_InfectionStart)
 		return
 		
-	if(Get_PlayerCount(1, 2) <= 0) End_Round(5.0, 0, CS_TEAM_T)
+	if(Get_PlayerCount(GetPlayersFlags:GetPlayers_ExcludeDead, 2) <= 0) End_Round(5.0, 0, CS_TEAM_T)
 	else if(Get_ZombieAlive2() <= 0) End_Round(5.0, 0, CS_TEAM_CT)
 }
 
@@ -774,7 +774,7 @@ public CountingDown()
 
 public Start_Game_Now()
 {
-	static TotalPlayer; TotalPlayer = Get_TotalInPlayer(1)
+	static TotalPlayer; TotalPlayer = Get_TotalInPlayer(GetPlayersFlags:GetPlayers_ExcludeDead)
 	static ZombieNumber; ZombieNumber = clamp(floatround(float(TotalPlayer) / 10.0, floatround_ceil), 1, 3)
 	
 	static PlayerList[32], PlayerNum; PlayerNum = 0
@@ -1877,7 +1877,7 @@ public Set_Player_Zombie(Id, Attacker, FirstZombie, Respawn, Stun)
 	StartArmor = 0
 	
 	// Health Setting
-	static TotalPlayer; TotalPlayer = Get_TotalInPlayer(1)
+	static TotalPlayer; TotalPlayer = Get_TotalInPlayer(GetPlayersFlags:GetPlayers_ExcludeDead)
 	static ZombieNumber; ZombieNumber = clamp(floatround(float(TotalPlayer) / 10.0, floatround_ceil), 1, 3)
 	
 	if(FirstZombie)
@@ -3584,27 +3584,24 @@ public Native_Register_ZombieClass(const Name[], const Desc[], Float:Speed, Floa
 
 // ======================== STOCK ========================
 // =======================================================
-stock Get_PlayerCount(Alive, Team)
+stock Get_PlayerCount( GetPlayersFlags:Flag, Team)
 // Alive: 0 - Dead | 1 - Alive | 2 - Both
 // Team: 1 - T | 2 - CT
 {
-	new Flag[4], Flag2[12]
+	new szTeamName[12]
 	new Players[32], PlayerNum
-
-	if(!Alive) formatex(Flag, sizeof(Flag), "%sb", Flag)
-	else if(Alive == 1) formatex(Flag, sizeof(Flag), "%sa", Flag)
 	
+	Flag |= GetPlayers_MatchTeam | GetPlayers_ExcludeHLTV
+
 	if(Team == 1) 
 	{
-		formatex(Flag, sizeof(Flag), "%se", Flag)
-		formatex(Flag2, sizeof(Flag2), "TERRORIST", Flag)
+		formatex(szTeamName, sizeof(szTeamName), "TERRORIST")
 	} else if(Team == 2) 
 	{
-		formatex(Flag, sizeof(Flag), "%se", Flag)
-		formatex(Flag2, sizeof(Flag2), "CT", Flag)
+		formatex(szTeamName, sizeof(szTeamName), "CT")
 	}
 	
-	get_players(Players, PlayerNum, Flag, Flag2)
+	get_players_ex(Players, PlayerNum, Flag, szTeamName)
 	
 	return PlayerNum
 }
@@ -3628,7 +3625,7 @@ stock Get_ZombieAlive2()
 	return Count
 }
 
-stock Get_TotalInPlayer(Alive)
+stock Get_TotalInPlayer(GetPlayersFlags:Alive)
 {
 	return Get_PlayerCount(Alive, 1) + Get_PlayerCount(Alive, 2)
 }
