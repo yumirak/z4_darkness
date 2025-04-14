@@ -4,6 +4,8 @@ Type: Gameplay
 Author: Dias Pendragon
 ============================================ */
 
+// #define REGISTER_BOT // buggy. don't enable it
+
 enum
 {
 	DAY_NONE = 0,
@@ -42,19 +44,20 @@ enum
 
 enum
 {
-	class_name = 0, 
-	class_desc, 
-	class_speed, 
-	class_gravity, 
-	class_knockback, 
-	class_defense, 
-	class_healthregen, 
-	class_model, 
-	class_clawmodel, 
-	class_deathsound, 
-	class_painsound1, 
-	class_painsound2, 
-	class_stunsound
+	class_name = 0,
+	class_desc,
+	class_speed,
+	class_gravity,
+	class_knockback,
+	class_defense,
+	class_healthregen,
+	class_model,
+	class_clawmodel,
+	class_deathsound,
+	class_painsound1,
+	class_painsound2,
+	class_stunsound,
+	class_cost
 }
 
 enum
@@ -64,6 +67,61 @@ enum
 	WEAPON_MELEE
 }
 
+
+enum
+{
+	TEAM_ZOMBIE = 1,
+	TEAM_HUMAN
+}
+
+enum
+{
+	DAY_NONE = 0,
+	DAY_LIGHT,
+	DAY_NIGHT,
+	DAY_AFTER
+}
+
+enum
+{
+	STATUS_HEALTH = 1,
+	STATUS_SPEED,
+	STATUS_STRENGTH
+}
+
+enum
+{
+	HEALTH_NONE = 0,
+	HEALTH_HEALING,
+	HEALTH_DRAINING
+}
+
+enum
+{
+	SPEED_NONE = 0,
+	SPEED_INC,
+	SPEED_DEC
+}
+
+enum
+{
+	STRENGTH_NONE = 0,
+	STRENGTH_HARDENING,
+	STRENGTH_WEAKENING
+}
+
+enum
+{
+	STAT_SCORE = 0,
+	STAT_DMG
+}
+
+enum
+{
+	GRENADE_HE = 2014,
+	GRENADE_FB,
+	GRENADE_SG
+}
 // Normal Natives
 native zd_get_user_zombie(id); // Return if User is A Zombie
 native zd_get_user_zombieclass(id); // Return id class of zombie

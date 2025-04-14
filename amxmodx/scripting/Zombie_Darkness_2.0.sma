@@ -8,6 +8,7 @@
 #include <fun>
 #include <xs>
 #include <reapi>
+#include <ZombieDarkness>
 
 #define PLUGIN "Zombie Darkness"
 #define VERSION "2.0"
@@ -44,80 +45,10 @@ const OFFSET_LINUX_WEAPONS = 4 // weapon offsets are only 4 steps higher on Linu
 #define TEAMCHANGE_DELAY 0.1
 #define TASK_TEAMMSG 200
 #define ID_TEAMMSG (taskid - TASK_TEAMMSG)
-enum
-{
-	TEAM_ZOMBIE = 1,
-	TEAM_HUMAN
-}
-
-enum
-{
-	DAY_NONE = 0,
-	DAY_LIGHT,
-	DAY_NIGHT,
-	DAY_AFTER
-}
-
-enum
-{
-	STATUS_HEALTH = 1,
-	STATUS_SPEED,
-	STATUS_STRENGTH
-}
-
-enum
-{
-	HEALTH_NONE = 0,
-	HEALTH_HEALING,
-	HEALTH_DRAINING
-}
-
-enum
-{
-	SPEED_NONE = 0,
-	SPEED_INC,
-	SPEED_DEC
-}
-
-enum
-{
-	STRENGTH_NONE = 0,
-	STRENGTH_HARDENING,
-	STRENGTH_WEAKENING
-}
-
-enum
-{
-	STAT_SCORE = 0,
-	STAT_DMG
-}
-
-enum
-{
-	GRENADE_HE = 2014,
-	GRENADE_FB,
-	GRENADE_SG
-}
 
 #define CLASS_ATTRIBUTES 14
 
-enum
-{
-	zclass_name = 0, 
-	zclass_desc, 
-	zclass_speed, 
-	zclass_gravity, 
-	zclass_knockback, 
-	zclass_defense, 
-	zclass_healthregen, 
-	zclass_model, 
-	zclass_clawmodel, 
-	zclass_deathsound, 
-	zclass_painsound1, 
-	zclass_painsound2, 
-	zclass_stunsound,
-	zclass_cost
-}
+
 
 // Loaded Configs
 new g_MinPlayer, g_CountDown_Time
