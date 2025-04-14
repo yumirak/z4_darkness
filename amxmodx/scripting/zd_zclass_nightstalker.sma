@@ -38,7 +38,11 @@ new Float:g_InvisibleTime, g_InvisibleClawModel[64]
 new g_BerserkSpeed, Float:g_BerserkDefense, g_BerserkDecPer015S, Array:g_BerserkSound
 new g_DashPower, g_DashJump, g_DashDashing, g_DashSound[64]
 
-new g_GameStart, g_IsUserBot, g_BotHamRegister, g_IsUserAlive
+#if defined REGISTER_BOT
+new g_BotHamRegister
+#endif
+
+new g_GameStart, g_IsUserBot, g_IsUserAlive
 new Float:CheckTime[33], Float:CheckTime2[33], Float:CheckTime3[33], g_SkillHud
 
 new g_Sprinting, g_PlayerKey[33][2], g_MsgScreenFade, g_InvisiblePercent[33]
@@ -122,21 +126,25 @@ public client_disconnect(id) UnSet_BitVar(g_IsUserAlive, id)
 public client_putinserver(id)
 {
 	UnSet_BitVar(g_IsUserBot, id)
+
+	#if defined REGISTER_BOT
 	if(!g_BotHamRegister && is_user_bot(id))
 	{
 		g_BotHamRegister = 1
 		set_task(0.1, "Bot_RegisterHam", id)
 	}
-	
+	#endif
 	if(is_user_bot(id)) Set_BitVar(g_IsUserBot, id)
 	
 	UnSet_BitVar(g_IsUserAlive, id)
 }
 
+#if defined REGISTER_BOT
 public Bot_RegisterHam(id)
 {
 	RegisterHamFromEntity(Ham_Spawn, id, "fw_PlayerSpawn_Post", 1)
 }
+#endif
 
 public fw_PlayerSpawn_Post(id)
 {

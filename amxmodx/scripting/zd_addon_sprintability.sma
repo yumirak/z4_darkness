@@ -22,7 +22,11 @@
 new g_PlayerKey[33][2], g_DoingSkill, Float:CheckTime[33], Float:CheckTime2[33]
 new SprintSpeed, SprintPower015S, SprintHeartSound[64]
 new g_MsgScreenFade, g_GameStart
-new g_IsUserAlive, g_BotHamRegister
+new g_IsUserAlive
+
+#if defined REGISTER_BOT
+new g_BotHamRegister
+#endif
 
 public plugin_init()
 {
@@ -62,19 +66,22 @@ public zd_user_infected(id)
 public client_disconnect(id) UnSet_BitVar(g_IsUserAlive, id)
 public client_putinserver(id)
 {
+	#if defined REGISTER_BOT
 	if(!g_BotHamRegister && is_user_bot(id))
 	{
 		g_BotHamRegister = 1
 		set_task(0.1, "Bot_RegisterHam", id)
 	}
-
+	#endif
 	UnSet_BitVar(g_IsUserAlive, id)
 }
 
+#if defined REGISTER_BOT
 public Bot_RegisterHam(id)
 {
 	RegisterHamFromEntity(Ham_Spawn, id, "fw_PlayerSpawn_Post", 1)
 }
+#endif
 
 public fw_PlayerSpawn_Post(id)
 {

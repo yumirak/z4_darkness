@@ -71,7 +71,7 @@ new Float:g_PlayerSpawn_Point[64][3], g_PlayerSpawn_Count
 
 // Main Vars
 new g_Connected, g_IsAlive, g_Countdown
-new g_GameStarted, g_InfectionStart, g_GameEnded, g_BotHamRegister, g_CurrentGameLight, g_CountTime, g_ZombieClass_Count
+new g_GameStarted, g_InfectionStart, g_GameEnded, g_CurrentGameLight, g_CountTime, g_ZombieClass_Count
 new g_Joined, g_IsZombie, g_PermanentDeath, g_CanChooseClass, g_Has_NightVision, g_UsingNVG, g_ClawA
 new g_MaxHealth[33], g_MaxArmor[33], g_TeamScore[4], g_HumanModel[33], g_ZombieClass[33], g_OldZombieClass[33]
 new Array:ZombieName, Array:ZombieDesc, Array:ZombieGravity, Array:ZombieSpeed, Array:ZombieKnockback, Array:ZombieDefense, Array:ZombieHealthRegen,
@@ -84,7 +84,9 @@ new g_AdrenalinePower[33], Float:g_AdrenalineIncreaseTime[33], Float:g_Adrenalin
 new g_HealthStatus[33], g_SpeedStatus[33], g_StrengthStatus[33], g_RoundStat[33][3], Float:HealthRegenTime[33], 
 g_AddHealth[33], g_Stunning, g_TempingAttack, g_MyEntity[33], g_ShockWave_SprID, g_Slowdown, g_FastAllow, 
 g_Forward_Nightmare, g_Forward_PreInfect, g_UnlockedClass[33][16]
-
+#if defined REGISTER_BOT
+new g_BotHamRegister
+#endif
 /*
 // NightStakler
 new g_HiddenName[32], g_HiddenDesc[32], Float:g_HiddenGravity, Float:g_HiddenSpeed, Float:g_HiddenKnockback, Float:g_HiddenDefense, g_HiddenHealthRegen,
@@ -483,13 +485,15 @@ public client_putinserver(id)
 {
 	Set_BitVar(g_Connected, id)
 	UnSet_BitVar(g_IsAlive, id)
-	
+
+#if defined REGISTER_BOT
 	if(!g_BotHamRegister && is_user_bot(id))
 	{
 		g_BotHamRegister = 1
 		set_task(0.1, "Bot_RegisterHam", id)
 	}
-	
+#endif
+
 	g_HumanModel[id] = Get_RandomArray(HumanModel)
 }
 
@@ -502,6 +506,7 @@ public client_disconnect(id)
 	Reset_PlayerStart(id)
 }
 
+#if defined REGISTER_BOT
 public Bot_RegisterHam(id)
 {
 	RegisterHamFromEntity(Ham_Spawn, id, "fw_PlayerSpawn_Post", 1)
@@ -510,6 +515,7 @@ public Bot_RegisterHam(id)
 	RegisterHamFromEntity(Ham_TraceAttack, id, "fw_PlayerTraceAttack")
 	RegisterHamFromEntity(Ham_TraceAttack, id, "fw_PlayerTraceAttack_Post", 1)
 }
+#endif
 
 public GM_Time()
 {
@@ -3511,20 +3517,20 @@ public Array:Native_GetArrayID(Attribute)
 
 	switch(Attribute)
 	{
-		case zclass_name: SelectedArray = ZombieName
-		case zclass_desc: SelectedArray = ZombieDesc
-		case zclass_speed: SelectedArray = ZombieSpeed
-		case zclass_gravity: SelectedArray = ZombieGravity
-		case zclass_knockback: SelectedArray = ZombieKnockback
-		case zclass_defense: SelectedArray = ZombieDefense
-		case zclass_healthregen: SelectedArray = ZombieHealthRegen
-		case zclass_model: SelectedArray = ZombieModel
-		case zclass_clawmodel: SelectedArray = ZombieClawModel
-		case zclass_deathsound: SelectedArray = ZombieDeathSound
-		case zclass_painsound1: SelectedArray = ZombiePainSound1
-		case zclass_painsound2: SelectedArray = ZombiePainSound2
-		case zclass_stunsound: SelectedArray = ZombieStunSound
-		case zclass_cost: SelectedArray = ZombieCost
+		case class_name: SelectedArray = ZombieName
+		case class_desc: SelectedArray = ZombieDesc
+		case class_speed: SelectedArray = ZombieSpeed
+		case class_gravity: SelectedArray = ZombieGravity
+		case class_knockback: SelectedArray = ZombieKnockback
+		case class_defense: SelectedArray = ZombieDefense
+		case class_healthregen: SelectedArray = ZombieHealthRegen
+		case class_model: SelectedArray = ZombieModel
+		case class_clawmodel: SelectedArray = ZombieClawModel
+		case class_deathsound: SelectedArray = ZombieDeathSound
+		case class_painsound1: SelectedArray = ZombiePainSound1
+		case class_painsound2: SelectedArray = ZombiePainSound2
+		case class_stunsound: SelectedArray = ZombieStunSound
+		case class_cost: SelectedArray = ZombieCost
 	}
 	
 	return SelectedArray

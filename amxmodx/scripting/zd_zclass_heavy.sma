@@ -31,7 +31,11 @@ zclass_cost
 #define Set_BitVar(%1,%2) %1 |= (1 << (%2 & 31))
 #define UnSet_BitVar(%1,%2) %1 &= ~(1 << (%2 & 31))
 
-new g_IsUserAlive, g_BotHamRegister, g_IsUserBot
+#if defined REGISTER_BOT
+new g_BotHamRegister
+#endif
+
+new g_IsUserAlive, g_IsUserBot
 new g_HardeningSkill, g_StompSkill
 new g_PlayerKey[33][2],  Float:CheckTime[33], Float:CheckTime2[33], Float:CheckTime3[33]
 new g_MsgScreenFade, g_MsgScreenShake, g_GameStart, g_SkillHud, g_MaxPlayers
@@ -120,23 +124,27 @@ public client_disconnect(id) UnSet_BitVar(g_IsUserAlive, id)
 public client_putinserver(id)
 {
 	UnSet_BitVar(g_IsUserBot, id)
-	
+
+	#if defined REGISTER_BOT
 	if(!g_BotHamRegister && is_user_bot(id))
 	{
 		g_BotHamRegister = 1
 		set_task(0.1, "Bot_RegisterHam", id)
 	}
-	
+	#endif
+
 	if(is_user_bot(id)) Set_BitVar(g_IsUserBot, id)
 	
 	UnSet_BitVar(g_IsUserAlive, id)
 }
 
+#if defined REGISTER_BOT
 public Bot_RegisterHam(id)
 {
 	RegisterHamFromEntity(Ham_Spawn, id, "fw_PlayerSpawn_Post", 1)
 	RegisterHamFromEntity(Ham_TakeDamage, id, "fw_TakeDamage")
 }
+#endif
 
 public fw_PlayerSpawn_Post(id)
 {

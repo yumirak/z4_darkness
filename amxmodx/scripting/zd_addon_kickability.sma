@@ -22,7 +22,11 @@
 new Float:KickTime, KickPower, Float:KickRange, Kick_VModel[64], Kick_PModel[64], g_OldModel[33][64]
 new g_CanKick, g_Kicking, g_KickAnimEnt[33], g_KickAvtEnt[33], KickSound[64], KickHitSound[64], SafeMode
 new g_MaxPlayers, g_GameStart
-new g_IsUserAlive, g_BotHamRegister
+new g_IsUserAlive
+
+#if defined REGISTER_BOT
+new g_BotHamRegister
+#endif
 
 public plugin_init() 
 {
@@ -72,19 +76,23 @@ public zd_user_infected(id)
 public client_disconnect(id) UnSet_BitVar(g_IsUserAlive, id)
 public client_putinserver(id)
 {
+#if defined REGISTER_BOT
 	if(!g_BotHamRegister && is_user_bot(id))
 	{
 		g_BotHamRegister = 1
 		set_task(0.1, "Bot_RegisterHam", id)
 	}
+#endif
 
 	UnSet_BitVar(g_IsUserAlive, id)
 }
 
+#if defined REGISTER_BOT
 public Bot_RegisterHam(id)
 {
 	RegisterHamFromEntity(Ham_Spawn, id, "fw_PlayerSpawn_Post", 1)
 }
+#endif
 
 public fw_PlayerSpawn_Post(id)
 {
