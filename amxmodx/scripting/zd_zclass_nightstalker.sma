@@ -5,7 +5,7 @@
 #include <fakemeta_util>
 #include <hamsandwich>
 #include <ZombieDarkness>
-#include <gamemaster>
+#include <reapi>
 
 #define PLUGIN "[ZD] Zombie Class: Night Stalker"
 #define VERSION "1.0"
@@ -444,7 +444,8 @@ public Active_SprintSkill(id)
 	set_pev(id, pev_sequence, 110)
 	
 	Set_WeaponAnim(id, 9)
-	GM_Set_PlayerSpeed(id, float(g_BerserkSpeed), 1)
+	set_pev(id, pev_maxspeed, float(g_BerserkSpeed))
+	// GM_Set_PlayerSpeed(id, float(g_BerserkSpeed), 1)
 
 	if(zd_get_user_nvg(id, 1, 0))
 	{
@@ -495,7 +496,9 @@ public Deactive_SprintSkill(id)
 	// Reset Claw
 	set_pev(id, pev_rendermode, kRenderNormal)
 	Set_WeaponAnim(id, 11)
-	GM_Set_PlayerSpeed(id, float(g_ClassSpeed), 1)
+	// 
+	set_pev(id, pev_maxspeed, float(g_ClassSpeed))
+	// GM_Set_PlayerSpeed(id, float(g_ClassSpeed), 1)
 	
 	static ClawModel[64]; formatex(ClawModel, sizeof(ClawModel), "models/%s/%s", GAME_FOLDER, g_ClawModel)
 	set_pev(id, pev_viewmodel2, ClawModel)

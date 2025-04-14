@@ -5,7 +5,7 @@
 #include <fakemeta_util>
 #include <hamsandwich>
 #include <ZombieDarkness>
-#include <gamemaster>
+#include <reapi>
 
 #define PLUGIN "[ZD] Zombie Class: Spin Diver"
 #define VERSION "1.0"
@@ -413,7 +413,8 @@ public Active_RollingSkill(id)
 	set_pev(id, pev_sequence, 111)
 	
 	Set_WeaponAnim(id, 9)
-	GM_Set_PlayerSpeed(id, float(g_RollingSpeed), 1)
+	set_pev(id, pev_maxspeed, float(g_RollingSpeed))
+	// GM_Set_PlayerSpeed(id, float(g_RollingSpeed), 1)
 
 	if(zd_get_user_nvg(id, 1, 0))
 	{
@@ -469,7 +470,8 @@ public Deactive_RollingSkill(id)
 
 	// Reset Claw
 	Set_WeaponAnim(id, 11)
-	GM_Set_PlayerSpeed(id, zclass_speed, 1)
+	set_pev(id, pev_maxspeed, zclass_speed)
+	// GM_Set_PlayerSpeed(id, zclass_speed, 1)
 }
 
 public Reset_Key(id)

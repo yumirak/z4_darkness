@@ -5,7 +5,7 @@
 #include <fakemeta_util>
 #include <hamsandwich>
 #include <ZombieDarkness>
-#include <gamemaster>
+#include <reapi>
 #include <xs>
 
 #define PLUGIN "[ZD] Zombie Class: Regular"
@@ -431,7 +431,8 @@ public Active_SprintSkill(id)
 	}
 	
 	// Set Speed
-	GM_Set_PlayerSpeed(id, float(SprintSpeed), 1)
+	set_pev(id, pev_maxspeed, float(SprintSpeed))
+	// GM_Set_PlayerSpeed(id, float(SprintSpeed), 1)
 }
 
 public Deactive_SprintSkill(id)
@@ -456,7 +457,8 @@ public Deactive_SprintSkill(id)
 	}
 	
 	// Speed
-	GM_Set_PlayerSpeed(id, zclass_speed, 1)
+	set_pev(id, pev_maxspeed, zclass_speed)
+	// GM_Set_PlayerSpeed(id, zclass_speed, 1)
 	
 	zd_set_hudfastupdate(id, 0)
 	zd_set_user_status(id, STATUS_SPEED, SPEED_NONE)

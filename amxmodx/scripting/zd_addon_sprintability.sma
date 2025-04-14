@@ -4,7 +4,7 @@
 #include <fakemeta>
 #include <ZombieDarkness>
 #include <hamsandwich>
-#include <gamemaster>
+#include <reapi>
 
 #define PLUGIN "[ZD] Addon: Sprint Ability"
 #define VERSION "1.0"
@@ -187,7 +187,8 @@ public Active_Skill(id)
 	message_end()	
 	
 	// Set Speed
-	GM_Set_PlayerSpeed(id, float(SprintSpeed), 1)
+	// GM_Set_PlayerSpeed(id, float(SprintSpeed), 1)
+	set_pev(id, pev_maxspeed, float(SprintSpeed))
 }
 
 public Deactive_Skill(id)
@@ -209,7 +210,7 @@ public Deactive_Skill(id)
 	message_end()
 	
 	// Speed
-	GM_Reset_PlayerSpeed(id)
+	rg_reset_maxspeed(id)
 	
 	zd_set_hudfastupdate(id, 0)
 	zd_set_user_status(id, STATUS_SPEED, SPEED_NONE)

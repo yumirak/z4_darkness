@@ -5,7 +5,7 @@
 #include <fakemeta_util>
 #include <hamsandwich>
 #include <ZombieDarkness>
-#include <gamemaster>
+#include <reapi>
 
 #define PLUGIN "[ZD] Zombie Class: Heavy"
 #define VERSION "1.0"
@@ -478,7 +478,8 @@ public Active_HardeningSkill(id)
 	set_pev(id, pev_sequence, 110)
 	
 	Set_WeaponAnim(id, 9)
-	GM_Set_PlayerSpeed(id, float(HardeningSpeed), 1)
+	set_pev(id, pev_maxspeed, float(HardeningSpeed))
+	// GM_Set_PlayerSpeed(id, float(HardeningSpeed), 1)
 
 	if(zd_get_user_nvg(id, 1, 0))
 	{
@@ -523,7 +524,8 @@ public Deactive_HardeningSkill(id)
 
 	// Reset Claw
 	Set_WeaponAnim(id, 11)
-	GM_Set_PlayerSpeed(id, zclass_speed, 1)
+	set_pev(id, pev_maxspeed, zclass_speed)
+	// GM_Set_PlayerSpeed(id, zclass_speed, 1)
 }
 
 public Active_Stomp(id)

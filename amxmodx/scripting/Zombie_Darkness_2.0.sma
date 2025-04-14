@@ -5,10 +5,9 @@
 #include <fakemeta_util>
 #include <cstrike>
 #include <hamsandwich>
-#include <gamemaster>
-// #include <dhud>
 #include <fun>
 #include <xs>
+#include <reapi>
 
 #define PLUGIN "Zombie Darkness"
 #define VERSION "2.0"
@@ -42,6 +41,9 @@ const OFFSET_LINUX_WEAPONS = 4 // weapon offsets are only 4 steps higher on Linu
 #define TASK_STUN 1843
 #define TASK_SLOWDOWN 1844
 
+#define TEAMCHANGE_DELAY 0.1
+#define TASK_TEAMMSG 200
+#define ID_TEAMMSG (taskid - TASK_TEAMMSG)
 enum
 {
 	TEAM_ZOMBIE = 1,
@@ -197,6 +199,8 @@ new g_BlockedObj[15][32] =
         "func_buyzone"
 }
 
+new const CS_TEAM_NAMES[][] = { "UNASSIGNED", "TERRORIST", "CT", "SPECTATOR" }
+
 // Knockback
 new Float:kb_weapon_power[] = 
 {
@@ -350,9 +354,9 @@ public plugin_init()
 	
 	// First Setting
 	Round_Setting()
-	
+	set_task(1.0, "GM_Time", _, _, _, "b")
 	// Patch Round Infinity
-	GM_EndRound_Block(true)
+	// GM_EndRound_Block(true)
 }
 
 public plugin_precache()
@@ -861,7 +865,7 @@ public Start_Game_Now()
 			continue
 			
 		// Set Team
-		GM_Set_PlayerTeam(i, CS_TEAM_CT)
+		set_team(i, TEAM_HUMAN)
 	}	
 	
 	// Set Time
@@ -1392,7 +1396,7 @@ public AfterNight_Effect()
 				Gravity = g_HiddenGravity
 			}*/
 			
-			GM_Set_PlayerSpeed(i, Speed / 2.0, 1)
+			set_maxspeed(i, Speed / 2.0)
 			set_pev(i, pev_gravity, Gravity * 2.0)
 			
 			ExecuteForward(g_Forward_Slowdown, g_fwResult, i)
@@ -1424,7 +1428,7 @@ public Reset_Slowdown(id)
 			Gravity = g_HiddenGravity
 		}*/
 		
-		GM_Set_PlayerSpeed(id, Speed, 1)
+		set_maxspeed(id, Speed)
 		set_pev(id, pev_gravity, Gravity)	
 		
 		UnSet_BitVar(g_Slowdown, id)
@@ -1437,7 +1441,7 @@ public client_PostThink(id)
 {
 	if(!Get_BitVar(g_Joined, id))
 	{
-		if(cs_get_user_team(id) == CS_TEAM_T) GM_Set_PlayerTeam(id, CS_TEAM_CT)
+		if(cs_get_user_team(id) == CS_TEAM_T) set_team(id, TEAM_HUMAN)
 		return
 	}
 	if(!Get_BitVar(g_IsAlive, id))
@@ -1928,8 +1932,8 @@ public Set_Player_Zombie(Id, Attacker, FirstZombie, Respawn, Stun)
 	set_scoreboard_attrib(Id, 0)
 	
 	// Set Classic Info
-	GM_Set_PlayerTeam(Id, CS_TEAM_T)
-	GM_Set_PlayerSpeed(Id, ArrayGetCell(ZombieSpeed, g_ZombieClass[Id]), 1)
+	set_team(Id, TEAM_ZOMBIE)
+	set_maxspeed(Id, ArrayGetCell(ZombieSpeed, g_ZombieClass[Id]))
 	
 	static StartHealth, StartArmor; 
 	StartHealth = g_MaxHealth[Id]
@@ -1987,7 +1991,7 @@ public Set_Player_Zombie(Id, Attacker, FirstZombie, Respawn, Stun)
 	
 	// Set Model
 	static Model[64]; ArrayGetString(ZombieModel, g_ZombieClass[Id], Model, sizeof(Model))
-	GM_Set_PlayerModel(Id, Model)
+	set_playermodel(Id, Model, true)
 	
 	// Bug Fix
 	cs_set_user_zoom(Id, CS_RESET_ZOOM, 1)
@@ -2188,12 +2192,12 @@ public Active_ZombieClass(Id, ClassID, Stun)
 	g_ZombieClass[Id] = ClassID
 	g_OldZombieClass[Id] = ClassID
 	
-	GM_Set_PlayerSpeed(Id, ArrayGetCell(ZombieSpeed, g_ZombieClass[Id]), 1)
+	set_maxspeed(Id, ArrayGetCell(ZombieSpeed, g_ZombieClass[Id]))
 	set_pev(Id, pev_gravity, ArrayGetCell(ZombieGravity, g_ZombieClass[Id]))
 	
 	// Set Model
 	static Model[64]; ArrayGetString(ZombieModel, g_ZombieClass[Id], Model, sizeof(Model))
-	GM_Set_PlayerModel(Id, Model)
+	set_playermodel(Id, Model, true)
 	
 	static Ent; Ent = fm_get_user_weapon_entity(Id, get_user_weapon(Id))
 	if(pev_valid(Ent)) fw_Item_Deploy_Post(Ent)
@@ -2676,11 +2680,11 @@ public fw_PlayerSpawn_Post(id)
 	set_task(0.01, "Set_LightStart", id)
 	fm_set_user_rendering(id)
 	
-	GM_Set_PlayerTeam(id, CS_TEAM_CT)
+	set_team(id, TEAM_HUMAN)
 	SetPlayerHealth(id, g_HumanHealth, 1)
 	set_pev(id, pev_gravity, g_HumanGravity)
 	cs_set_user_armor(id, g_HumanArmor, CS_ARMOR_KEVLAR)
-	GM_Reset_PlayerSpeed(id)
+	rg_reset_maxspeed(id)
 	
 	// Start Weapon
 	fm_strip_user_weapons(id)
@@ -2691,7 +2695,7 @@ public fw_PlayerSpawn_Post(id)
 
 	static PlayerModel[32]
 	ArrayGetString(HumanModel, g_HumanModel[id], PlayerModel, sizeof(PlayerModel))
-	GM_Set_PlayerModel(id, PlayerModel)
+	set_playermodel(id, PlayerModel, false)
 	
 	// Fade Out
 	message_begin(MSG_ONE_UNRELIABLE, g_MsgScreenFade, {0,0,0}, id)
@@ -3019,7 +3023,8 @@ public End_Round(Float:EndTime, RoundDraw, CsTeams:Team)
 	if(g_GameEnded) return
 	if(RoundDraw) 
 	{
-		GM_TerminateRound(EndTime, WINSTATUS_DRAW)
+		// GM_TerminateRound(EndTime, WINSTATUS_DRAW)
+		rg_round_end(EndTime, WINSTATUS_DRAW, /*ScenarioEventEndRound:event*/ ROUND_NONE)
 		ExecuteForward(g_Forward_RoundEnd, g_fwResult, CS_TEAM_UNASSIGNED)
 		
 		client_print(0, print_center, "%L", LANG, "MESSAGE_GAME_START")
@@ -3030,7 +3035,8 @@ public End_Round(Float:EndTime, RoundDraw, CsTeams:Team)
 			g_Round++
 			g_TeamScore[TEAM_ZOMBIE]++
 			
-			GM_TerminateRound(6.0, WINSTATUS_TERRORIST)
+			// GM_TerminateRound(6.0, WINSTATUS_TERRORIST)
+			rg_round_end(6.0, WINSTATUS_TERRORISTS, /*ScenarioEventEndRound:event*/ ROUND_NONE)
 			ExecuteForward(g_Forward_RoundEnd, g_fwResult, CS_TEAM_T)
 			
 			ArrayGetString(S_WinZombie, Get_RandomArray(S_WinZombie), Sound, sizeof(Sound))
@@ -3042,7 +3048,8 @@ public End_Round(Float:EndTime, RoundDraw, CsTeams:Team)
 			g_Round++
 			g_TeamScore[TEAM_HUMAN]++
 			
-			GM_TerminateRound(6.0, WINSTATUS_CT)
+			// GM_TerminateRound(6.0, WINSTATUS_CT)
+			rg_round_end(6.0, WINSTATUS_CTS, /*ScenarioEventEndRound:event*/ ROUND_NONE)
 			ExecuteForward(g_Forward_RoundEnd, g_fwResult, CS_TEAM_CT)
 			
 			ArrayGetString(S_WinHuman, Get_RandomArray(S_WinHuman), Sound, sizeof(Sound))
@@ -3120,7 +3127,7 @@ public Activate_Stun(id)
 	Set_BitVar(g_Stunning, id)
 	
 	SetPlayerHealth(id, 1, 0)
-	GM_Set_PlayerSpeed(id, 0.1, 1)
+	set_maxspeed(id, 0.1)
 	Set_PlayerStopTime(id, g_StunTime)
 	set_pev(id, pev_gravity, 999.0)
 	
@@ -4301,23 +4308,6 @@ stock client_printc(index, const text[], any:...)
 	}
 } 
 
-stock fm_cs_get_user_team(id)
-{
-	// Prevent server crash if entity's private data not initalized
-	if (pev_valid(id) != PDATA_SAFE)
-		return 0;
-	
-	return get_pdata_int(id, OFFSET_CSTEAMS, OFFSET_LINUX)
-}
-
-stock fm_cs_set_user_deaths(id, value)
-{
-	// Prevent server crash if entity's private data not initalized
-	if (pev_valid(id) != PDATA_SAFE)
-		return;
-	
-	set_pdata_int(id, OFFSET_CSDEATHS, value, OFFSET_LINUX)
-}
 
 stock Set_WeaponAnim(id, anim)
 {
@@ -4414,3 +4404,72 @@ stock Get_SpeedVector(const Float:origin1[3],const Float:origin2[3],Float:speed,
 	new_velocity[1] *= (num * 2.0)
 	new_velocity[2] *= (num / 2.0)
 }  
+public set_playermodel(id, const model[], bool:update_index )
+{
+	if(!is_user_alive(id))
+		return false
+
+	return rg_set_user_model(id,model,update_index);
+}
+
+public set_team(id, team)
+{
+	if(!is_user_connected(id))
+		return
+
+	switch(team)
+	{
+		case TEAM_HUMAN:  /*if(fm_cs_get_user_team(id) != TEAM_CT)*/ fm_cs_set_user_team(id, TEAM_CT, 1)
+		case TEAM_ZOMBIE: /*if(fm_cs_get_user_team(id) != TEAM_TERRORIST)*/ fm_cs_set_user_team(id, TEAM_TERRORIST, 1)
+	}
+}
+public set_maxspeed(id, Float:speed)
+{
+	if(!is_user_connected(id))
+		return
+
+	set_pev(id, pev_maxspeed, speed)
+}
+stock fm_cs_get_user_deaths(client)
+{
+	return get_member(client, m_iDeaths);
+}
+stock fm_cs_set_user_deaths(client, num)
+{
+	return get_member(client, m_iDeaths, num);
+}
+// Set a Player's Team
+stock fm_cs_set_user_team(id, TeamName:team, send_message)
+{
+	remove_task(id+TASK_TEAMMSG)
+	set_member(id, m_iTeam, team);
+	// rg_set_user_team(id, TeamName:team) // bug: fakeclient can't join game
+	if (send_message) set_task(TEAMCHANGE_DELAY, "fm_cs_set_user_team_msg", id+TASK_TEAMMSG)
+}
+
+// Send User Team Message (Note: this next message can be received by other plugins)
+public fm_cs_set_user_team_msg(taskid)
+{
+	// Tell everyone my new team
+	emessage_begin(MSG_ALL, get_user_msgid("TeamInfo"))
+	ewrite_byte(ID_TEAMMSG) // player
+	ewrite_string(CS_TEAM_NAMES[_:fm_cs_get_user_team(ID_TEAMMSG)]) // team
+	emessage_end()
+
+	// Fix for AMXX/CZ bots which update team paramater from ScoreInfo message
+	emessage_begin(MSG_BROADCAST, get_user_msgid("ScoreInfo"))
+	ewrite_byte(ID_TEAMMSG) // id
+	ewrite_short(pev(ID_TEAMMSG, pev_frags)) // frags
+	ewrite_short(fm_cs_get_user_deaths(ID_TEAMMSG)) // deaths
+	ewrite_short(0) // class?
+	ewrite_short(_:fm_cs_get_user_team(ID_TEAMMSG)) // team
+	emessage_end()
+}
+
+stock fm_cs_get_user_team(client)
+{
+	new team = get_member(client, m_iTeam);
+	return team;
+}
+
+

@@ -4,7 +4,7 @@
 #include <fakemeta>
 #include <hamsandwich>
 #include <ZombieDarkness>
-#include <gamemaster>
+#include <reapi>
 
 #define PLUGIN "[ZD] Addon: Kick Ability"
 #define VERSION "1.0"
@@ -135,7 +135,7 @@ public fw_CmdStart(id, UCHandle, Seed)
 		pev(id, pev_viewmodel2, g_OldModel[id], 63)
 		
 		// Stop Player
-		GM_Set_PlayerSpeed(id, 0.1, 1)
+		set_pev(id, pev_maxspeed, 1)
 		Set_Player_NextAttack(id, KickTime + get_pdata_float(id, 83, 5))
 		
 		// Kick Action: View Model
@@ -201,7 +201,7 @@ public Reset_Kick(id)
 		return
 		
 	set_pev(id, pev_viewmodel2, g_OldModel[id])
-	GM_Reset_PlayerSpeed(id)
+	rg_reset_maxspeed(id)
 }
 
 public Handle_PlayerAnim(id)
