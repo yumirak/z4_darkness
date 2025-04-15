@@ -2702,6 +2702,25 @@ public fw_PlayerTakeDamage(Victim, Inflictor, Attacker, Float:Damage, DamageBits
 	// Cancel damage when game not yet started
 	if(!g_GameStarted || g_GameEnded || !g_InfectionStart)
 		return HAM_SUPERCEDE
+	if(Victim == Attacker || !Get_BitVar(g_Connected, Attacker))
+		return HAM_SUPERCEDE
+	if(Get_BitVar(g_Stunning, Victim))
+		return HAM_SUPERCEDE
+	if(!(Get_BitVar(g_IsZombie, Victim) || Get_BitVar(g_IsZombie, Attacker)))
+		return HAM_SUPERCEDE
+	if(g_DayTime != DAY_NIGHT)
+		return HAM_IGNORED
+
+	static victim_health
+	victim_health = pev(Victim, pev_health)
+
+	// Stun Check
+	if(victim_health - Damage <= 1)
+	{
+		Activate_Stun(Victim)
+		SetHamParamFloat(4, 0.0)
+		return HAM_SUPERCEDE
+	}
 
 	return HAM_IGNORED
 }
@@ -2739,27 +2758,6 @@ public fw_PlayerTakeDamage_Post(Victim, Inflictor, Attacker, Float:Damage, Damag
 
 		g_RoundStat[Attacker][STAT_DMG] += floatround(Damage)
 		ExecuteForward(g_Forward_RoundDamage, g_fwResult, Attacker, g_RoundStat[Attacker][STAT_DMG])
-		
-		// Stun Check
-		if(g_DayTime == DAY_NIGHT)
-		{
-			if(pev(Victim, pev_flags) & FL_DUCKING)
-			{
-				SetHamParamFloat(4, CurrentDamage)
-				return HAM_IGNORED
-			} else {
-				if(pev(Victim, pev_health) - CurrentDamage > 0)
-				{
-					SetHamParamFloat(4, CurrentDamage)
-					return HAM_IGNORED
-				} else {
-					Activate_Stun(Victim)
-					SetHamParamFloat(4, 0.0)
-					
-					return HAM_IGNORED
-				}
-			}
-		}
 
 		if(pev_valid(Victim) == 2) set_member(Victim, m_flVelocityModifier, 0.25) // TODO: zclass_painshock
 
